@@ -17,7 +17,7 @@ export interface Dialogue {
   nextDialogueId?: string;
   action?: () => void;
   requiresItem?: string;
-  givesItem?: { id: string; name: string };
+  givesItem?: { id: string; name: string; icon: string };
   givesQuest?: { id: string; title: string; description: string; objective: string };
 }
 
@@ -25,7 +25,6 @@ export class NPC {
   private config: NPCConfig;
   private mesh: THREE.Group | null = null;
   private currentDialogueIndex: number = 0;
-  private hasInteracted: boolean = false;
 
   constructor(config: NPCConfig) {
     this.config = config;
@@ -81,7 +80,6 @@ export class NPC {
     if (this.config.dialogues.length === 0) return null;
     
     const dialogue = this.config.dialogues[this.currentDialogueIndex];
-    this.hasInteracted = true;
     
     return dialogue;
   }

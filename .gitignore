@@ -5,35 +5,15 @@ node_modules/
 # Build outputs
 dist/
 build/
-coverage/
-htmlcov/
+target/
+
+# Logs
+*.log
 
 # Environment variables
 .env
 .env.local
 .env.*
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-
-# Virtual environments
-venv/
-.venv/
-env/
-ENV/
-
-# Testing
-.mypy_cache/
-.pytest_cache/
-.coverage
-
-# Logs
-*.log
 
 # IDE files
 .vscode/
@@ -42,15 +22,37 @@ ENV/
 *.swo
 *.tmp
 
-# OS generated files
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.ENV
+.venv.bak
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/modules/
 .DS_Store
 Thumbs.db
 
-# Node.js
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Compiled JavaScript
+*.js.map
+*.jsx.map
+*.ts.map
+*.tsx.map
 
-# TypeScript/JavaScript build
+# TypeScript
 *.tsbuildinfo
 ```

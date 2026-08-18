@@ -149,7 +149,7 @@ export class Enemy {
     }
   }
 
-  private updateIdle(delta: number, playerPosition: THREE.Vector3, distance: number) {
+  private updateIdle(_delta: number, _playerPosition: THREE.Vector3, distance: number) {
     // Check if player is in range
     if (distance <= this.config.detectionRange) {
       this.state = EnemyState.CHASE;
@@ -162,7 +162,7 @@ export class Enemy {
     }
   }
 
-  private updatePatrol(delta: number, playerPosition: THREE.Vector3, distance: number) {
+  private updatePatrol(delta: number, _playerPosition: THREE.Vector3, distance: number) {
     // Check if player is in range
     if (distance <= this.config.detectionRange) {
       this.state = EnemyState.CHASE;
@@ -217,7 +217,7 @@ export class Enemy {
     this.mesh.userData.velocity = direction.clone();
   }
 
-  private updateAttack(delta: number, playerPosition: THREE.Vector3) {
+  private updateAttack(_delta: number, playerPosition: THREE.Vector3) {
     const time = performance.now() / 1000;
     
     // Check if player is still in range
