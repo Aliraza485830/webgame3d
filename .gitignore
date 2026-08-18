@@ -1,58 +1,91 @@
-```
+```gitignore
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.class
+*.dll
+*.so
+*.a
+*.exe
+*.out
+
 # Dependencies
 node_modules/
-
-# Build outputs
-dist/
-build/
-target/
-
-# Logs
-*.log
-
-# Environment variables
+venv/
+.venv/
 .env
 .env.local
 .env.*
 
-# IDE files
-.vscode/
-.idea/
+# Build directories
+dist/
+build/
+target/
+*.jar
+*.war
+*.class
+
+# Logs and temp files
+*.log
+*.tmp
 *.swp
 *.swo
-*.tmp
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-.ENV
-.venv.bak
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git/modules/
+# Editors
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# System files
 .DS_Store
 Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Icon?
+Network Trash Folder
+Temporary Items
+.apdisk
 
-# Compiled JavaScript
-*.js.map
-*.jsx.map
-*.ts.map
-*.tsx.map
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+*.coverage
 
-# TypeScript
-*.tsbuildinfo
+# Testing
+.mypy_cache/
+.pytest_cache/
+.nyc_output/
+coverage.xml
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```

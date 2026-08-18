@@ -171,10 +171,6 @@ export class LightingManager {
     
     this.torchLights.forEach(light => {
       this.scene.remove(light);
-      // Safely dispose - check for shadow before accessing
-      if (light.shadow) {
-        light.shadow.dispose?.();
-      }
       light.dispose();
     });
     this.torchLights = [];
