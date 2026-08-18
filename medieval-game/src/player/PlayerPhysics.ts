@@ -17,7 +17,6 @@ export class PlayerBody {
   private acceleration: number = 30;
   
   // Ground check
-  private canJump: boolean = false;
   private groundContact: boolean = false;
 
   constructor(world: CANNON.World, startPosition: THREE.Vector3) {

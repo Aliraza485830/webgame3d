@@ -145,7 +145,7 @@ export class WorldBuilder {
     });
   }
 
-  private createHut(objects: WorldObjects, position: THREE.Vector3, flip: boolean) {
+  private createHut(objects: WorldObjects, position: THREE.Vector3, _flip: boolean) {
     const hutWidth = 6;
     const hutDepth = 6;
     const hutHeight = 4;
