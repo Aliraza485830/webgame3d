@@ -17,8 +17,9 @@ export interface Dialogue {
   nextDialogueId?: string;
   action?: () => void;
   requiresItem?: string;
-  givesItem?: { id: string; name: string; icon: string };
+  givesItem?: { id: string; name: string; icon: string; type?: 'quest' | 'consumable' | 'currency' | 'equipment' };
   givesQuest?: { id: string; title: string; description: string; objective: string };
+  givesCoins?: number;
 }
 
 export class NPC {

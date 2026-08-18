@@ -37,6 +37,9 @@ export const Game: React.FC = () => {
   const addToInventory = useGameStore((state) => state.addToInventory);
   const completeQuest = useGameStore((state) => state.completeQuest);
   const activeQuest = useGameStore((state) => state.activeQuest);
+  const takeDamage = useGameStore((state) => state.takeDamage);
+  const addCoins = useGameStore((state) => state.addCoins);
+  const setTimeOfDay = useGameStore((state) => state.setTimeOfDay);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -134,7 +137,8 @@ export const Game: React.FC = () => {
           id: 'quest_complete',
           text: 'You have done it! The village is safe once more. Take this as a token of our gratitude.',
           nextDialogueId: 'farewell',
-          givesItem: { id: 'gold_pouch', name: 'Gold Pouch', icon: '💰' }
+          givesItem: { id: 'gold_pouch', name: 'Gold Pouch', icon: '💰', type: 'currency' },
+          givesCoins: 100
         },
         {
           id: 'farewell',
@@ -254,10 +258,19 @@ export const Game: React.FC = () => {
           hasMore: !!nextDialogue.nextDialogueId
         });
 
-        // Handle quest completion
+        // Handle quest completion and rewards
         if (nextDialogue.givesItem && activeQuest?.id === 'defeat_enemy') {
           completeQuest('defeat_enemy');
-          addToInventory(nextDialogue.givesItem);
+          addToInventory({
+            ...nextDialogue.givesItem,
+            type: nextDialogue.givesItem.type || 'quest'
+          });
+          audioManager.playPickup();
+        }
+        
+        // Handle coin rewards
+        if (nextDialogue.givesCoins) {
+          addCoins(nextDialogue.givesCoins);
           audioManager.playPickup();
         }
       } else {
@@ -298,6 +311,9 @@ export const Game: React.FC = () => {
 
           if (killed) {
             console.log('Enemy defeated!');
+            // Reward coins for killing enemy
+            addCoins(50);
+            
             // Update quest
             if (activeQuest?.id === 'defeat_enemy') {
               setDialogue({
@@ -326,6 +342,7 @@ export const Game: React.FC = () => {
     let lastTime = performance.now();
     let frameCount = 0;
     let footstepTimer = 0;
+    let timeAccumulator = 0;
 
     const animate = () => {
       requestAnimationFrame(animate);
@@ -333,6 +350,15 @@ export const Game: React.FC = () => {
       const currentTime = performance.now();
       const delta = Math.min((currentTime - lastTime) / 1000, 0.1); // Cap delta
       lastTime = currentTime;
+
+      // Update time of day (1 game minute per real second)
+      timeAccumulator += delta;
+      if (timeAccumulator >= 1) {
+        const currentTime = useGameStore.getState().timeOfDay;
+        const newTime = currentTime + 1 / 60; // Add 1 minute
+        setTimeOfDay(newTime >= 24 ? 0 : newTime);
+        timeAccumulator = 0;
+      }
 
       // Update physics
       physicsWorld.step(1 / 60, delta, 3);
@@ -352,15 +378,26 @@ export const Game: React.FC = () => {
         }
       }
 
-      // Update lighting
+      // Update lighting based on time
       if (lightingManagerRef.current) {
-        lightingManagerRef.current.update(delta);
+        const hours = useGameStore.getState().timeOfDay;
+        lightingManagerRef.current.update(delta, hours);
       }
 
       // Update enemies
       enemiesRef.current.forEach(enemy => {
         if (enemy.isAlive()) {
           enemy.update(delta, playerController.getPosition());
+          
+          // Check if enemy is attacking player
+          const playerPos = playerController.getPosition();
+          const enemyPos = enemy.getPosition();
+          const distance = playerPos.distanceTo(enemyPos);
+          
+          if (distance < 2.5 && enemy.canAttack()) {
+            takeDamage(10);
+            audioManager.playHit();
+          }
         }
       });
 
@@ -411,7 +448,7 @@ export const Game: React.FC = () => {
 
       audioManager.stopAmbient();
     };
-  }, [setIsLoading, setQuest, addToInventory, completeQuest, activeQuest]);
+  }, [setIsLoading, setQuest, addToInventory, completeQuest, takeDamage, addCoins, setTimeOfDay]);
 
   const handleCloseDialogue = () => {
     setDialogue(null);

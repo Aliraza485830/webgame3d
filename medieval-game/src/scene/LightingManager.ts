@@ -97,11 +97,16 @@ export class LightingManager {
   /**
    * Update lighting based on time of day
    * @param delta - Time since last frame
+   * @param hours - Current time in hours (0-24)
    */
-  public update(delta: number) {
-    // Slowly advance time
-    this.timeOfDay += delta * 0.01; // Full cycle in ~100 seconds
-    if (this.timeOfDay > 1) this.timeOfDay -= 1;
+  public update(delta: number, hours?: number) {
+    // Use provided hours or slowly advance time
+    if (hours !== undefined) {
+      this.timeOfDay = hours / 24;
+    } else {
+      this.timeOfDay += delta * 0.01; // Full cycle in ~100 seconds
+      if (this.timeOfDay > 1) this.timeOfDay -= 1;
+    }
     
     // Update sun position and color based on time
     if (this.sunLight && this.ambientLight) {

@@ -48,6 +48,14 @@ export class Enemy {
   }
 
   /**
+   * Check if enemy can attack (for Game.tsx to use)
+   */
+  public canAttack(): boolean {
+    const time = performance.now() / 1000;
+    return time - this.lastAttackTime >= this.attackCooldown;
+  }
+
+  /**
    * Create the visual representation of the enemy
    */
   public createMesh(): THREE.Group {
