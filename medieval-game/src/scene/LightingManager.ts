@@ -165,18 +165,18 @@ export class LightingManager {
     
     if (this.sunLight) {
       this.scene.remove(this.sunLight);
-      this.sunLight.dispose();
       this.sunLight = null;
     }
     
-    this.torchLights.forEach(light => {
-      this.scene.remove(light);
-      // Safely dispose - check for shadow before accessing
-      if (light.shadow) {
-        light.shadow.dispose?.();
+    // Remove torch lights - properly dispose shadows first to avoid Three.js errors
+    while (this.torchLights.length > 0) {
+      const light = this.torchLights.pop();
+      if (light) {
+        if (light.shadow) {
+          light.shadow.dispose();
+        }
+        this.scene.remove(light);
       }
-      light.dispose();
-    });
-    this.torchLights = [];
+    }
   }
 }
