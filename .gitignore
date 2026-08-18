@@ -1,69 +1,54 @@
-```gitignore
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.class
-*.dll
-*.so
-*.a
-*.exe
-*.out
-
+```
 # Dependencies
 node_modules/
-venv/
-.venv/
-.env
-.env.local
-.env.*
 
-# Build directories
+# Build outputs
 dist/
 build/
 target/
-*.jar
-*.war
-*.class
 
-# Logs and temp files
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.ENV
+.python-version
+.pytest_cache/
+.mypy_cache/
+
+# Logs
 *.log
-*.tmp
-*.swp
-*.swo
 
-# Editors
-.vscode/
-.idea/
-*.iml
-*.ipr
-*.iws
-
-# System files
+# OS generated files
 .DS_Store
-Thumbs.db
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Icon?
-Network Trash Folder
-Temporary Items
-.apdisk
+Thumbs.db
 
-# Coverage reports
+# Environment variables
+.env
+.env.local
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Coverage
 coverage/
 htmlcov/
 .coverage
-*.coverage
-
-# Testing
-.mypy_cache/
-.pytest_cache/
-.nyc_output/
-coverage.xml
 
 # Compressed files
 *.zip
@@ -88,4 +73,12 @@ coverage.xml
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+
+# Gradle
+.gradle/
+
+# Temporary files
+*.tmp
+*.temp
+*~
 ```
