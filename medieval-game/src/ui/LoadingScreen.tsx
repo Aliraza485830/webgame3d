@@ -11,6 +11,7 @@ interface LoadingScreenProps {
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress = 0 }) => {
   const setLoading = useGameStore((state) => state.setLoading);
+  const isLoading = useGameStore((state) => state.isLoading);
 
   useEffect(() => {
     // Auto-hide when progress reaches 100
@@ -18,6 +19,11 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress = 0 }) =>
       setTimeout(() => setLoading(false, 100), 500);
     }
   }, [progress, setLoading]);
+
+  // Don't render if not loading
+  if (!isLoading && progress >= 100) {
+    return null;
+  }
 
   return (
     <div style={styles.container}>

@@ -71,7 +71,7 @@ export class PlayerController {
     
     // Mouse input for camera
     document.addEventListener('mousemove', (e) => {
-      if (this.mouseDown || true) { // Always allow mouse look
+      if (document.pointerLockElement === document.body || this.mouseDown) {
         const sensitivity = 0.002;
         this.cameraAngle -= e.movementX * sensitivity;
         this.cameraPitch -= e.movementY * sensitivity;
