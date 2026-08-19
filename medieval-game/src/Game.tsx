@@ -69,6 +69,8 @@ export const Game: React.FC = () => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -194,6 +196,11 @@ export const Game: React.FC = () => {
         // Start ambient audio
         audioManager.resume();
         audioManager.playAmbient();
+        
+        // Enable pointer lock for mouse look
+        if (containerRef.current) {
+          containerRef.current.requestPointerLock?.();
+        }
       }
     }, 100);
 

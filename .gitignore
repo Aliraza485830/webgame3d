@@ -1,4 +1,4 @@
-```gitignore
+```
 # Dependencies
 node_modules/
 
@@ -7,12 +7,22 @@ dist/
 build/
 target/
 
+# Logs
+*.log
+
 # Environment variables
 .env
 .env.local
-.env.*
+*.env.*
 
-# Python
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Python specific
 __pycache__/
 *.pyc
 *.pyo
@@ -31,48 +41,61 @@ nosetests.xml
 coverage.xml
 *.cover
 *.log
-*.tmp
+.git/refs/replace/*
+.hypothesis/
 
-# Logs
-*.log
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-
-# Compiled JavaScript
-*.js.map
-*.jsx.map
-*.ts.map
-*.tsx.map
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-
-# Testing
+# Node.js specific
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules/
+jspm_packages/
+web_modules/
+lib-cov/
 coverage/
 .nyc_output/
 istanbul/
-.mocha
-.jest
+.mocha/
+.mochacoverage/
+.tmp/
+temp/
+build/
+dist/
+node/
+jspm_packages/
+typings/
+.npm/
+.yarn/
+package-lock.json
+yarn.lock
+.nyc_output/
+.nyc_coverage/
+.coverage/
+.coverage.*
 
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
+# TypeScript specific
+*.tsbuildinfo
+*.tsx
+*.js.map
+*.ts.map
 
-# Coverage directory used by tools like istanbul
-lib-cov/
+# General build/test artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 ```
