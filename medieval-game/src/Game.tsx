@@ -37,6 +37,9 @@ export const Game: React.FC = () => {
   const addToInventory = useGameStore((state) => state.addToInventory);
   const completeQuest = useGameStore((state) => state.completeQuest);
   const activeQuest = useGameStore((state) => state.activeQuest);
+  const takeDamage = useGameStore((state) => state.takeDamage);
+  const addCoins = useGameStore((state) => state.addCoins);
+  const setTimeOfDay = useGameStore((state) => state.setTimeOfDay);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -134,7 +137,8 @@ export const Game: React.FC = () => {
           id: 'quest_complete',
           text: 'You have done it! The village is safe once more. Take this as a token of our gratitude.',
           nextDialogueId: 'farewell',
-          givesItem: { id: 'gold_pouch', name: 'Gold Pouch', icon: '💰' }
+          givesItem: { id: 'gold_pouch', name: 'Gold Pouch', icon: '💰', type: 'currency' },
+          givesCoins: 100
         },
         {
           id: 'farewell',
@@ -254,10 +258,19 @@ export const Game: React.FC = () => {
           hasMore: !!nextDialogue.nextDialogueId
         });
 
-        // Handle quest completion
+        // Handle quest completion and rewards
         if (nextDialogue.givesItem && activeQuest?.id === 'defeat_enemy') {
           completeQuest('defeat_enemy');
-          addToInventory(nextDialogue.givesItem);
+          addToInventory({
+            ...nextDialogue.givesItem,
+            type: nextDialogue.givesItem.type || 'quest'
+          });
+          audioManager.playPickup();
+        }
+        
+        // Handle coin rewards
+        if (nextDialogue.givesCoins) {
+          addCoins(nextDialogue.givesCoins);
           audioManager.playPickup();
         }
       } else {
@@ -298,6 +311,9 @@ export const Game: React.FC = () => {
 
           if (killed) {
             console.log('Enemy defeated!');
+            // Reward coins for killing enemy
+            addCoins(50);
+            
             // Update quest
             if (activeQuest?.id === 'defeat_enemy') {
               setDialogue({
@@ -326,6 +342,7 @@ export const Game: React.FC = () => {
     let lastTime = performance.now();
     let frameCount = 0;
     let footstepTimer = 0;
+    let timeAccumulator = 0;
 
     const animate = () => {
       requestAnimationFrame(animate);
@@ -333,6 +350,15 @@ export const Game: React.FC = () => {
       const currentTime = performance.now();
       const delta = Math.min((currentTime - lastTime) / 1000, 0.1); // Cap delta
       lastTime = currentTime;
+
+      // Update time of day (1 game minute per real second)
+      timeAccumulator += delta;
+      if (timeAccumulator >= 1) {
+        const currentTime = useGameStore.getState().timeOfDay;
+        const newTime = currentTime + 1 / 60; // Add 1 minute
+        setTimeOfDay(newTime >= 24 ? 0 : newTime);
+        timeAccumulator = 0;
+      }
 
       // Update physics
       physicsWorld.step(1 / 60, delta, 3);
@@ -352,15 +378,26 @@ export const Game: React.FC = () => {
         }
       }
 
-      // Update lighting
+      // Update lighting based on time
       if (lightingManagerRef.current) {
-        lightingManagerRef.current.update(delta);
+        const hours = useGameStore.getState().timeOfDay;
+        lightingManagerRef.current.update(delta, hours);
       }
 
       // Update enemies
       enemiesRef.current.forEach(enemy => {
         if (enemy.isAlive()) {
           enemy.update(delta, playerController.getPosition());
+          
+          // Check if enemy is attacking player
+          const playerPos = playerController.getPosition();
+          const enemyPos = enemy.getPosition();
+          const distance = playerPos.distanceTo(enemyPos);
+          
+          if (distance < 2.5 && enemy.canAttack()) {
+            takeDamage(10);
+            audioManager.playHit();
+          }
         }
       });
 
@@ -411,7 +448,7 @@ export const Game: React.FC = () => {
 
       audioManager.stopAmbient();
     };
-  }, [setIsLoading, setQuest, addToInventory, completeQuest, activeQuest]);
+  }, [setIsLoading, setQuest, addToInventory, completeQuest, takeDamage, addCoins, setTimeOfDay]);
 
   const handleCloseDialogue = () => {
     setDialogue(null);
@@ -438,23 +475,36 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 /**
- * Create simple player character mesh
+ * Create detailed player character mesh with armor and weapon
  */
 function createPlayerMesh(): THREE.Group {
   const group = new THREE.Group();
 
-  // Body
+  // Body - armored torso
   const bodyGeo = new THREE.CapsuleGeometry(0.4, 1, 8, 16);
   const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x3366cc,
-    roughness: 0.7
+    color: 0x2c5aa0,
+    roughness: 0.4,
+    metalness: 0.6
   });
   const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
   bodyMesh.position.y = 0.9;
   bodyMesh.castShadow = true;
   group.add(bodyMesh);
 
-  // Head
+  // Armor plates
+  const chestPlateGeo = new THREE.BoxGeometry(0.5, 0.6, 0.3);
+  const chestPlateMat = new THREE.MeshStandardMaterial({
+    color: 0x888888,
+    roughness: 0.3,
+    metalness: 0.8
+  });
+  const chestPlate = new THREE.Mesh(chestPlateGeo, chestPlateMat);
+  chestPlate.position.set(0, 1.1, 0.2);
+  chestPlate.castShadow = true;
+  group.add(chestPlate);
+
+  // Head with helmet
   const headGeo = new THREE.SphereGeometry(0.35, 16, 16);
   const headMat = new THREE.MeshStandardMaterial({
     color: 0xffdbac,
@@ -464,6 +514,83 @@ function createPlayerMesh(): THREE.Group {
   headMesh.position.y = 1.7;
   headMesh.castShadow = true;
   group.add(headMesh);
+
+  // Helmet
+  const helmetGeo = new THREE.SphereGeometry(0.38, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+  const helmetMat = new THREE.MeshStandardMaterial({
+    color: 0x666666,
+    roughness: 0.3,
+    metalness: 0.7
+  });
+  const helmet = new THREE.Mesh(helmetGeo, helmetMat);
+  helmet.position.y = 1.75;
+  helmet.rotation.x = Math.PI;
+  helmet.castShadow = true;
+  group.add(helmet);
+
+  // Sword on back
+  const swordGroup = new THREE.Group();
+  
+  // Blade
+  const bladeGeo = new THREE.BoxGeometry(0.08, 1.2, 0.15);
+  const bladeMat = new THREE.MeshStandardMaterial({
+    color: 0xcccccc,
+    roughness: 0.2,
+    metalness: 0.9
+  });
+  const blade = new THREE.Mesh(bladeGeo, bladeMat);
+  blade.position.set(0.3, 1.2, -0.3);
+  blade.rotation.x = Math.PI / 6;
+  blade.castShadow = true;
+  swordGroup.add(blade);
+
+  // Hilt
+  const hiltGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.3, 8);
+  const hiltMat = new THREE.MeshStandardMaterial({
+    color: 0x8B4513,
+    roughness: 0.8
+  });
+  const hilt = new THREE.Mesh(hiltGeo, hiltMat);
+  hilt.position.set(0.3, 0.65, -0.3);
+  hilt.rotation.x = Math.PI / 6;
+  hilt.castShadow = true;
+  swordGroup.add(hilt);
+
+  // Crossguard
+  const guardGeo = new THREE.BoxGeometry(0.4, 0.08, 0.08);
+  const guard = new THREE.Mesh(guardGeo, bladeMat);
+  guard.position.set(0.3, 0.75, -0.3);
+  guard.rotation.x = Math.PI / 6;
+  guard.castShadow = true;
+  swordGroup.add(guard);
+
+  group.add(swordGroup);
+
+  // Shield on arm
+  const shieldGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.1, 16);
+  const shieldMat = new THREE.MeshStandardMaterial({
+    color: 0x8B4513,
+    roughness: 0.7
+  });
+  const shield = new THREE.Mesh(shieldGeo, shieldMat);
+  shield.rotation.z = Math.PI / 2;
+  shield.rotation.y = Math.PI / 4;
+  shield.position.set(-0.5, 1.0, 0.3);
+  shield.castShadow = true;
+  group.add(shield);
+
+  // Shield emblem
+  const emblemGeo = new THREE.CircleGeometry(0.2, 8);
+  const emblemMat = new THREE.MeshStandardMaterial({
+    color: 0xffd700,
+    roughness: 0.4,
+    metalness: 0.5
+  });
+  const emblem = new THREE.Mesh(emblemGeo, emblemMat);
+  emblem.position.set(-0.5, 1.0, 0.36);
+  emblem.rotation.z = Math.PI / 2;
+  emblem.rotation.y = Math.PI / 4;
+  group.add(emblem);
 
   return group;
 }
