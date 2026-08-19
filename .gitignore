@@ -1,4 +1,4 @@
-```
+```gitignore
 # Dependencies
 node_modules/
 
