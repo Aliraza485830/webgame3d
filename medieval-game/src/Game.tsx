@@ -475,23 +475,36 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 /**
- * Create simple player character mesh
+ * Create detailed player character mesh with armor and weapon
  */
 function createPlayerMesh(): THREE.Group {
   const group = new THREE.Group();
 
-  // Body
+  // Body - armored torso
   const bodyGeo = new THREE.CapsuleGeometry(0.4, 1, 8, 16);
   const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x3366cc,
-    roughness: 0.7
+    color: 0x2c5aa0,
+    roughness: 0.4,
+    metalness: 0.6
   });
   const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
   bodyMesh.position.y = 0.9;
   bodyMesh.castShadow = true;
   group.add(bodyMesh);
 
-  // Head
+  // Armor plates
+  const chestPlateGeo = new THREE.BoxGeometry(0.5, 0.6, 0.3);
+  const chestPlateMat = new THREE.MeshStandardMaterial({
+    color: 0x888888,
+    roughness: 0.3,
+    metalness: 0.8
+  });
+  const chestPlate = new THREE.Mesh(chestPlateGeo, chestPlateMat);
+  chestPlate.position.set(0, 1.1, 0.2);
+  chestPlate.castShadow = true;
+  group.add(chestPlate);
+
+  // Head with helmet
   const headGeo = new THREE.SphereGeometry(0.35, 16, 16);
   const headMat = new THREE.MeshStandardMaterial({
     color: 0xffdbac,
@@ -501,6 +514,83 @@ function createPlayerMesh(): THREE.Group {
   headMesh.position.y = 1.7;
   headMesh.castShadow = true;
   group.add(headMesh);
+
+  // Helmet
+  const helmetGeo = new THREE.SphereGeometry(0.38, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+  const helmetMat = new THREE.MeshStandardMaterial({
+    color: 0x666666,
+    roughness: 0.3,
+    metalness: 0.7
+  });
+  const helmet = new THREE.Mesh(helmetGeo, helmetMat);
+  helmet.position.y = 1.75;
+  helmet.rotation.x = Math.PI;
+  helmet.castShadow = true;
+  group.add(helmet);
+
+  // Sword on back
+  const swordGroup = new THREE.Group();
+  
+  // Blade
+  const bladeGeo = new THREE.BoxGeometry(0.08, 1.2, 0.15);
+  const bladeMat = new THREE.MeshStandardMaterial({
+    color: 0xcccccc,
+    roughness: 0.2,
+    metalness: 0.9
+  });
+  const blade = new THREE.Mesh(bladeGeo, bladeMat);
+  blade.position.set(0.3, 1.2, -0.3);
+  blade.rotation.x = Math.PI / 6;
+  blade.castShadow = true;
+  swordGroup.add(blade);
+
+  // Hilt
+  const hiltGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.3, 8);
+  const hiltMat = new THREE.MeshStandardMaterial({
+    color: 0x8B4513,
+    roughness: 0.8
+  });
+  const hilt = new THREE.Mesh(hiltGeo, hiltMat);
+  hilt.position.set(0.3, 0.65, -0.3);
+  hilt.rotation.x = Math.PI / 6;
+  hilt.castShadow = true;
+  swordGroup.add(hilt);
+
+  // Crossguard
+  const guardGeo = new THREE.BoxGeometry(0.4, 0.08, 0.08);
+  const guard = new THREE.Mesh(guardGeo, bladeMat);
+  guard.position.set(0.3, 0.75, -0.3);
+  guard.rotation.x = Math.PI / 6;
+  guard.castShadow = true;
+  swordGroup.add(guard);
+
+  group.add(swordGroup);
+
+  // Shield on arm
+  const shieldGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.1, 16);
+  const shieldMat = new THREE.MeshStandardMaterial({
+    color: 0x8B4513,
+    roughness: 0.7
+  });
+  const shield = new THREE.Mesh(shieldGeo, shieldMat);
+  shield.rotation.z = Math.PI / 2;
+  shield.rotation.y = Math.PI / 4;
+  shield.position.set(-0.5, 1.0, 0.3);
+  shield.castShadow = true;
+  group.add(shield);
+
+  // Shield emblem
+  const emblemGeo = new THREE.CircleGeometry(0.2, 8);
+  const emblemMat = new THREE.MeshStandardMaterial({
+    color: 0xffd700,
+    roughness: 0.4,
+    metalness: 0.5
+  });
+  const emblem = new THREE.Mesh(emblemGeo, emblemMat);
+  emblem.position.set(-0.5, 1.0, 0.36);
+  emblem.rotation.z = Math.PI / 2;
+  emblem.rotation.y = Math.PI / 4;
+  group.add(emblem);
 
   return group;
 }

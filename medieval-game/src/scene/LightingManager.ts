@@ -163,9 +163,12 @@ export class LightingManager {
    * Cleanup
    */
   public dispose() {
-    if (this.ambientLight) {
-      this.scene.remove(this.ambientLight);
-      this.ambientLight = null;
+    // Remove torch lights first - don't dispose shadows manually to avoid Three.js errors
+    while (this.torchLights.length > 0) {
+      const light = this.torchLights.pop();
+      if (light) {
+        this.scene.remove(light);
+      }
     }
     
     if (this.sunLight) {
@@ -173,15 +176,9 @@ export class LightingManager {
       this.sunLight = null;
     }
     
-    // Remove torch lights - properly dispose shadows first to avoid Three.js errors
-    while (this.torchLights.length > 0) {
-      const light = this.torchLights.pop();
-      if (light) {
-        if (light.shadow) {
-          light.shadow.dispose();
-        }
-        this.scene.remove(light);
-      }
+    if (this.ambientLight) {
+      this.scene.remove(this.ambientLight);
+      this.ambientLight = null;
     }
   }
 }
